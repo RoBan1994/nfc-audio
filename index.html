@@ -1,8 +1,82 @@
 <!DOCTYPE html>
 <html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NFC Audio</title>
+
+    <style>
+        body {
+            margin: 0;
+            height: 100vh;
+            background: black;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: sans-serif;
+            overflow: hidden;
+        }
+
+        #start {
+            font-size: 28px;
+            text-align: center;
+            opacity: 0.9;
+        }
+
+        #hint {
+            font-size: 14px;
+            opacity: 0.5;
+            margin-top: 10px;
+        }
+
+        .fade {
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; visibility: hidden; }
+        }
+    </style>
+</head>
+
 <body>
-    <audio autoplay controls>
-        <source src="mumma-bhajan.mp3" type="audio/mpeg">
-    </audio>
+
+<div id="start">
+    Tap anywhere
+    <div id="hint">Audio will start immediately</div>
+</div>
+
+<audio id="audio" preload="auto">
+    <source src="mumma-bhajan.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    const audio = document.getElementById("audio");
+    const start = document.getElementById("start");
+
+    async function begin() {
+        // UX polish: haptic feedback if available
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+
+        start.classList.add("fade");
+
+        try {
+            await audio.play();
+        } catch (e) {
+            console.log("Autoplay blocked, waiting for gesture:", e);
+        }
+
+        // remove listener after first interaction
+        document.removeEventListener("click", begin);
+        document.removeEventListener("touchstart", begin);
+    }
+
+    document.addEventListener("click", begin);
+    document.addEventListener("touchstart", begin);
+</script>
+
 </body>
 </html>
